@@ -157,32 +157,61 @@ $settings = $result_settings->fetch_assoc();
     </header>
 
     <section id="news" class="section-padding">
-        <div class="container">
-            <div class="section-title">
-                <h2>ข่าวประชาสัมพันธ์ล่าสุด</h2>
-                <p>ติดตามความเคลื่อนไหวและกิจกรรมต่างๆ ของวิทยาลัย</p>
-            </div>
-            <div class="programs-grid">
-                <?php
-                $sql_news = "SELECT * FROM news ORDER BY news_date DESC LIMIT 3";
-                $result_news = $conn->query($sql_news);
-                if ($result_news->num_rows > 0) {
-                    while($row = $result_news->fetch_assoc()) {
-                ?>
-                <div class="program-card">
-                    <div class="card-content" style="text-align: left;">
-                        <span style="color: var(--primary-color); font-size: 0.9rem;">
-                            <i class="far fa-calendar-alt"></i> <?php echo date("d/m/Y", strtotime($row["news_date"])); ?>
-                        </span>
-                        <h3 style="margin-top: 10px; color: var(--text-dark);"><?php echo htmlspecialchars($row["title"]); ?></h3>
-                        <p style="margin-top: 10px; color: var(--text-light);"><?php echo mb_strimwidth(htmlspecialchars($row["description"]), 0, 100, "..."); ?></p>
-                        <a href="news_detail.php?id=<?php echo $row['id']; ?>" class="read-more">อ่านเพิ่มเติม <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
-                <?php } } else { echo "<p style='text-align:center; grid-column: 1/-1;'>ยังไม่มีข้อมูลข่าวสารในระบบ</p>"; } ?>
-            </div>
+    <div class="container">
+        <div class="section-title">
+            <h2>ข่าวประชาสัมพันธ์ล่าสุด</h2>
+            <p>ติดตามความเคลื่อนไหวและกิจกรรมต่างๆ ของวิทยาลัย</p>
         </div>
-    </section>
+<?php
+if (!$conn) {
+    die("เชื่อมต่อฐานข้อมูลไม่สำเร็จ");
+}
+?>
+        <div class="news-grid">
+            <?php
+            $sql_news = "SELECT * FROM news ORDER BY news_date DESC LIMIT 3";
+            $result_news = $conn->query($sql_news);
+
+            if ($result_news->num_rows > 0) {
+                while($row = $result_news->fetch_assoc()) {
+            ?>
+            <div class="news-card">
+                <div class="news-card-image">
+                    <?php if (!empty($row["image"])) { ?>
+                        <img src="uploads/news/<?php echo htmlspecialchars($row["image"]); ?>" alt="<?php echo htmlspecialchars($row["title"]); ?>">
+                    <?php } else { ?>
+                        <img src="https://via.placeholder.com/600x350?text=College+News" alt="ข่าวประชาสัมพันธ์">
+                    <?php } ?>
+                </div>
+
+                <div class="news-card-content">
+                    <div class="news-date">
+                        <i class="far fa-calendar-alt"></i>
+                        <?php echo date("d/m/Y", strtotime($row["news_date"])); ?>
+                    </div>
+
+                    <h3 class="news-title">
+                        <?php echo htmlspecialchars($row["title"]); ?>
+                    </h3>
+
+                    <p class="news-description">
+                        <?php echo mb_strimwidth(strip_tags($row["description"]), 0, 120, "..."); ?>
+                    </p>
+
+                    <a href="news_detail.php?id=<?php echo $row['id']; ?>" class="news-btn">
+                        อ่านเพิ่มเติม <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <?php
+                }
+            } else {
+                echo "<p class='no-news'>ยังไม่มีข้อมูลข่าวสารในระบบ</p>";
+            }
+            ?>
+        </div>
+    </div>
+</section>
 
     <section id="programs" class="section-padding" style="background: rgba(255,255,255,0.5);">
         <div class="container">
